@@ -1,7 +1,7 @@
 <?php
 session_start();
-include 'config/database.php';
-include 'includes/auth.php';
+include 'config/database.php'; // Pastikan path ini benar
+include 'includes/auth.php'; // Pastikan path ini benar
 checkLogin();
 
 // Statistik dashboard
@@ -36,13 +36,14 @@ $transaksi_terbaru = mysqli_query($conn, "
     LIMIT 5
 ");
 
-$title = "Dashboard - Sistem Inventaris";
-include 'includes/header.php';
+$title = "Dashboard - HABIBI";
+include 'includes/header.php'; // Memuat header
+
+// Konten spesifik Dashboard dimulai di sini
 ?>
 
 <h2><i class="fas fa-home"></i> Dashboard</h2>
 
-<!-- Statistik Cards -->
 <div class="row mb-4">
     <div class="col-md-3">
         <div class="card bg-primary text-white">
@@ -107,7 +108,6 @@ include 'includes/header.php';
 </div>
 
 <div class="row">
-    <!-- Barang Stok Rendah -->
     <div class="col-md-6">
         <div class="card">
             <div class="card-header">
@@ -128,10 +128,10 @@ include 'includes/header.php';
                         <tbody>
                             <?php while ($row = mysqli_fetch_assoc($barang_stok_rendah)): ?>
                             <tr>
-                                <td><?= $row['nama_barang'] ?></td>
-                                <td><span class="badge bg-danger"><?= $row['stok'] ?></span></td>
-                                <td><?= $row['stok_minimum'] ?></td>
-                                <td><?= $row['satuan'] ?></td>
+                                <td><?= htmlspecialchars($row['nama_barang']) ?></td>
+                                <td><span class="badge bg-danger"><?= htmlspecialchars($row['stok']) ?></span></td>
+                                <td><?= htmlspecialchars($row['stok_minimum']) ?></td>
+                                <td><?= htmlspecialchars($row['satuan']) ?></td>
                             </tr>
                             <?php endwhile; ?>
                         </tbody>
@@ -144,7 +144,6 @@ include 'includes/header.php';
         </div>
     </div>
     
-    <!-- Transaksi Terbaru -->
     <div class="col-md-6">
         <div class="card">
             <div class="card-header">
@@ -165,13 +164,13 @@ include 'includes/header.php';
                         <tbody>
                             <?php while ($row = mysqli_fetch_assoc($transaksi_terbaru)): ?>
                             <tr>
-                                <td><?= $row['nama_barang'] ?></td>
+                                <td><?= htmlspecialchars($row['nama_barang']) ?></td>
                                 <td>
                                     <span class="badge <?= $row['jenis_transaksi'] == 'masuk' ? 'bg-success' : 'bg-danger' ?>">
-                                        <?= ucfirst($row['jenis_transaksi']) ?>
+                                        <?= ucfirst(htmlspecialchars($row['jenis_transaksi'])) ?>
                                     </span>
                                 </td>
-                                <td><?= $row['jumlah'] ?></td>
+                                <td><?= htmlspecialchars($row['jumlah']) ?></td>
                                 <td><?= date('d/m/Y', strtotime($row['tanggal_transaksi'])) ?></td>
                             </tr>
                             <?php endwhile; ?>
@@ -186,4 +185,5 @@ include 'includes/header.php';
     </div>
 </div>
 
-<?php include 'includes/footer.php'; ?>
+
+        </div></main><?php include 'includes/footer.php'; ?>

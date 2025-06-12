@@ -59,15 +59,7 @@ include 'includes/header.php';
                         <i class="fas fa-sign-in-alt"></i> Login
                     </button>
                 </form>
-                
-                <div class="mt-3 text-center">
-                    <small class="text-muted">
-                        Demo: admin/admin123 atau user1/admin123
-                    </small>
-                </div>
             </div>
         </div>
     </div>
 </div>
-
-<?php include 'includes/footer.php'; ?>

@@ -17,9 +17,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $query = "INSERT INTO users (username, password, nama_lengkap, role) VALUES ('$username', '$password', '$nama_lengkap', '$role')";
         if (mysqli_query($conn, $query)) {
-            $message = "<div class='alert alert-success'>User berhasil ditambahkan!</div>";
+            // Mengubah ke notifikasi kuning
+            $message = "<div class='bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4'>User berhasil ditambahkan!</div>";
         } else {
-            $message = "<div class='alert alert-danger'>Error: " . mysqli_error($conn) . "</div>";
+            $message = "<div class='bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4'>Error: " . mysqli_error($conn) . "</div>";
         }
     }
     
@@ -38,9 +39,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         if (mysqli_query($conn, $query)) {
-            $message = "<div class='alert alert-success'>User berhasil diupdate!</div>";
+            // Mengubah ke notifikasi kuning
+            $message = "<div class='bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4'>User berhasil diupdate!</div>";
         } else {
-            $message = "<div class='alert alert-danger'>Error: " . mysqli_error($conn) . "</div>";
+            $message = "<div class='bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4'>Error: " . mysqli_error($conn) . "</div>";
         }
     }
 }
@@ -51,13 +53,14 @@ if (isset($_GET['delete'])) {
     
     // Prevent deleting current user
     if ($id == $_SESSION['user_id']) {
-        $message = "<div class='alert alert-danger'>Tidak dapat menghapus user yang sedang login!</div>";
+        $message = "<div class='bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4'>Tidak dapat menghapus user yang sedang login!</div>";
     } else {
         $query = "DELETE FROM users WHERE id=$id";
         if (mysqli_query($conn, $query)) {
-            $message = "<div class='alert alert-success'>User berhasil dihapus!</div>";
+            // Mengubah ke notifikasi kuning
+            $message = "<div class='bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4'>User berhasil dihapus!</div>";
         } else {
-            $message = "<div class='alert alert-danger'>Error: " . mysqli_error($conn) . "</div>";
+            $message = "<div class='bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4'>Error: " . mysqli_error($conn) . "</div>";
         }
     }
 }
@@ -73,128 +76,200 @@ if (isset($_GET['edit'])) {
 // Get all users
 $users = mysqli_query($conn, "SELECT * FROM users ORDER BY nama_lengkap");
 
-$title = "Users - Sistem Inventaris";
+$title = "Users - HABIBI";
 include 'includes/header.php';
 ?>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2><i class="fas fa-users"></i> Kelola Users</h2>
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalUser">
-        <i class="fas fa-plus"></i> Tambah User
-    </button>
-</div>
+<!-- Pastikan semua konten user berada di dalam elemen <main> ini -->
+<main class="flex-grow container mx-auto px-4 py-8 max-w-7xl">
+    <h2 class="text-2xl font-bold mb-6 flex items-center gap-2 text-gray-700">
+        <i class="fas fa-users text-yellow-500"></i> Kelola Users
+    </h2>
 
-<?= $message ?>
+    <?= $message ?>
 
-<!-- Tabel Users -->
-<div class="card">
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Username</th>
-                        <th>Nama Lengkap</th>
-                        <th>Role</th>
-                        <th>Tanggal Dibuat</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php 
-                    $no = 1;
-                    while ($row = mysqli_fetch_assoc($users)): 
-                    ?>
-                    <tr>
-                        <td><?= $no++ ?></td>
-                        <td><?= $row['username'] ?></td>
-                        <td><?= $row['nama_lengkap'] ?></td>
-                        <td>
-                            <span class="badge <?= $row['role'] == 'admin' ? 'bg-danger' : 'bg-primary' ?>">
-                                <?= ucfirst($row['role']) ?>
-                            </span>
-                        </td>
-                        <td><?= date('d/m/Y H:i', strtotime($row['created_at'])) ?></td>
-                        <td>
-                            <a href="?edit=<?= $row['id'] ?>" class="btn btn-warning btn-sm">
-                                <i class="fas fa-edit"></i> Edit
-                            </a>
-                            <?php if ($row['id'] != $_SESSION['user_id']): ?>
-                            <a href="?delete=<?= $row['id'] ?>" class="btn btn-danger btn-sm" 
-                               onclick="return confirm('Yakin ingin menghapus user ini?')">
-                                <i class="fas fa-trash"></i> Hapus
-                            </a>
-                            <?php endif; ?>
-                        </td>
-                    </tr>
-                    <?php endwhile; ?>
-                </tbody>
-            </table>
+    <!-- Tombol Tambah User -->
+    <div class="mb-6">
+        <button onclick="openModal()" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg shadow flex items-center gap-2 transition-colors">
+            <i class="fas fa-plus"></i> Tambah User
+        </button>
+    </div>
+
+    <!-- Tabel Users -->
+    <div class="bg-white rounded-lg shadow">
+        <div class="border-b px-4 py-3 flex items-center gap-2">
+            <i class="fas fa-list text-yellow-500"></i>
+            <span class="font-semibold text-gray-700">Daftar Users</span>
+        </div>
+        <div class="p-4">
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-sm text-left text-gray-700">
+                    <thead>
+                        <tr class="bg-gray-50">
+                            <th class="py-3 px-4 font-semibold">No</th>
+                            <th class="py-3 px-4 font-semibold">Username</th>
+                            <th class="py-3 px-4 font-semibold">Nama Lengkap</th>
+                            <th class="py-3 px-4 font-semibold">Role</th>
+                            <th class="py-3 px-4 font-semibold">Tanggal Dibuat</th>
+                            <th class="py-3 px-4 font-semibold">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php 
+                        $no = 1;
+                        while ($row = mysqli_fetch_assoc($users)): 
+                        ?>
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="py-3 px-4"><?= $no++ ?></td>
+                            <td class="py-3 px-4 font-medium"><?= htmlspecialchars($row['username']) ?></td>
+                            <td class="py-3 px-4"><?= htmlspecialchars($row['nama_lengkap']) ?></td>
+                            <td class="py-3 px-4">
+                                <span class="inline-block px-2 py-1 rounded text-xs font-semibold <?= $row['role'] == 'admin' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700' ?>">
+                                    <?= ucfirst(htmlspecialchars($row['role'])) ?>
+                                </span>
+                            </td>
+                            <td class="py-3 px-4"><?= date('d/m/Y H:i', strtotime($row['created_at'])) ?></td>
+                            <td class="py-3 px-4">
+                                <div class="flex gap-2">
+                                    <button onclick="editUser(<?= htmlspecialchars(json_encode($row)) ?>)" 
+                                            class="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded text-sm flex items-center gap-1 transition-colors">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <?php if ($row['id'] != $_SESSION['user_id']): ?>
+                                    <a href="?delete=<?= $row['id'] ?>" 
+                                       onclick="return confirm('Yakin ingin menghapus user ini?')"
+                                       class="bg-gray-400 hover:bg-gray-500 text-white px-3 py-1 rounded text-sm flex items-center gap-1 transition-colors">
+                                        <i class="fas fa-trash"></i> Hapus
+                                    </a>
+                                    <?php endif; ?>
+                                </div>
+                            </td>
+                        </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- Modal Tambah/Edit User -->
-<div class="modal fade" id="modalUser" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    <?= $edit_data ? 'Edit User' : 'Tambah User' ?>
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <!-- Modal Tambah/Edit User -->
+    <div id="modalUser" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-4">
+            <div class="border-b px-6 py-4 flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-gray-700" id="modalTitle">Tambah User</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-            <form method="POST">
-                <div class="modal-body">
-                    <?php if ($edit_data): ?>
-                    <input type="hidden" name="id" value="<?= $edit_data['id'] ?>">
-                    <?php endif; ?>
+            <form method="POST" id="userForm">
+                <div class="p-6">
+                    <input type="hidden" name="id" id="userId">
                     
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
-                        <input type="text" name="username" class="form-control" 
-                               value="<?= $edit_data['username'] ?? '' ?>" required>
+                    <div class="mb-4">
+                        <label for="username" class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                        <input type="text" name="username" id="username" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent" 
+                                required>
                     </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">
-                            Password <?= $edit_data ? '(Kosongkan jika tidak ingin mengubah)' : '' ?>
+                    
+                    <div class="mb-4">
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+                            Password <span id="passwordNote" class="text-gray-500 text-xs"></span>
                         </label>
-                        <input type="password" name="password" class="form-control" 
-                               <?= $edit_data ? '' : 'required' ?>>
+                        <input type="password" name="password" id="password" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent">
                     </div>
-                    <div class="mb-3">
-                        <label for="nama_lengkap" class="form-label">Nama Lengkap</label>
-                        <input type="text" name="nama_lengkap" class="form-control" 
-                               value="<?= $edit_data['nama_lengkap'] ?? '' ?>" required>
+                    
+                    <div class="mb-4">
+                        <label for="nama_lengkap" class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label>
+                        <input type="text" name="nama_lengkap" id="nama_lengkap" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent" 
+                                required>
                     </div>
-                    <div class="mb-3">
-                        <label for="role" class="form-label">Role</label>
-                        <select name="role" class="form-control" required>
+                    
+                    <div class="mb-4">
+                        <label for="role" class="block text-sm font-medium text-gray-700 mb-2">Role</label>
+                        <select name="role" id="role" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent" 
+                                required>
                             <option value="">Pilih Role</option>
-                            <option value="admin" <?= ($edit_data && $edit_data['role'] == 'admin') ? 'selected' : '' ?>>Admin</option>
-                            <option value="user" <?= ($edit_data && $edit_data['role'] == 'user') ? 'selected' : '' ?>>User</option>
+                            <option value="admin">Admin</option>
+                            <option value="user">User</option>
                         </select>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" name="<?= $edit_data ? 'edit' : 'tambah' ?>" class="btn btn-primary">
-                        <?= $edit_data ? 'Update' : 'Simpan' ?>
+                
+                <div class="border-t px-6 py-4 flex justify-end gap-3">
+                    <button type="button" onclick="closeModal()" 
+                            class="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                        Batal
+                    </button>
+                    <button type="submit" name="tambah" id="submitBtn" 
+                            class="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition-colors">
+                        Simpan
                     </button>
                 </div>
             </form>
         </div>
     </div>
-</div>
 
-<?php if ($edit_data): ?>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    var modal = new bootstrap.Modal(document.getElementById('modalUser'));
-    modal.show();
-});
-</script>
-<?php endif; ?>
+    <script>
+    let isEditMode = false;
 
-<?php include 'includes/footer.php'; ?>
+    function openModal() {
+        document.getElementById('modalUser').classList.remove('hidden');
+        document.getElementById('modalUser').classList.add('flex');
+        document.getElementById('modalTitle').textContent = 'Tambah User';
+        document.getElementById('userForm').reset();
+        document.getElementById('submitBtn').name = 'tambah';
+        document.getElementById('submitBtn').textContent = 'Simpan';
+        document.getElementById('passwordNote').textContent = '';
+        document.getElementById('password').required = true;
+        isEditMode = false;
+    }
+
+    function editUser(userData) {
+        document.getElementById('modalUser').classList.remove('hidden');
+        document.getElementById('modalUser').classList.add('flex');
+        document.getElementById('modalTitle').textContent = 'Edit User';
+        
+        document.getElementById('userId').value = userData.id;
+        document.getElementById('username').value = userData.username;
+        document.getElementById('nama_lengkap').value = userData.nama_lengkap;
+        document.getElementById('role').value = userData.role;
+        document.getElementById('password').value = '';
+        
+        document.getElementById('submitBtn').name = 'edit';
+        document.getElementById('submitBtn').textContent = 'Update';
+        document.getElementById('passwordNote').textContent = '(Kosongkan jika tidak ingin mengubah)';
+        document.getElementById('password').required = false;
+        isEditMode = true;
+    }
+
+    function closeModal() {
+        document.getElementById('modalUser').classList.add('hidden');
+        document.getElementById('modalUser').classList.remove('flex');
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('modalUser').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeModal();
+        }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeModal();
+        }
+    });
+
+    // Show modal if editing from URL parameter
+    <?php if ($edit_data): ?>
+    document.addEventListener('DOMContentLoaded', function() {
+        editUser(<?= json_encode($edit_data) ?>);
+    });
+    <?php endif; ?>
+    </script>
+</main>

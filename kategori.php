@@ -14,9 +14,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $query = "INSERT INTO kategori (nama_kategori, deskripsi) VALUES ('$nama_kategori', '$deskripsi')";
         if (mysqli_query($conn, $query)) {
-            $message = "<div class='alert alert-success'>Kategori berhasil ditambahkan!</div>";
+            $message = "<div class='bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4'>Kategori berhasil ditambahkan!</div>";
         } else {
-            $message = "<div class='alert alert-danger'>Error: " . mysqli_error($conn) . "</div>";
+            $message = "<div class='bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4'>Error: " . mysqli_error($conn) . "</div>";
         }
     }
     
@@ -27,9 +27,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $query = "UPDATE kategori SET nama_kategori='$nama_kategori', deskripsi='$deskripsi' WHERE id=$id";
         if (mysqli_query($conn, $query)) {
-            $message = "<div class='alert alert-success'>Kategori berhasil diupdate!</div>";
+            $message = "<div class='bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4'>Kategori berhasil diupdate!</div>";
         } else {
-            $message = "<div class='alert alert-danger'>Error: " . mysqli_error($conn) . "</div>";
+            $message = "<div class='bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4'>Error: " . mysqli_error($conn) . "</div>";
         }
     }
 }
@@ -39,9 +39,9 @@ if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
     $query = "DELETE FROM kategori WHERE id=$id";
     if (mysqli_query($conn, $query)) {
-        $message = "<div class='alert alert-success'>Kategori berhasil dihapus!</div>";
+        $message = "<div class='bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4'>Kategori berhasil dihapus!</div>";
     } else {
-        $message = "<div class='alert alert-danger'>Error: " . mysqli_error($conn) . "</div>";
+        $message = "<div class='bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4'>Error: " . mysqli_error($conn) . "</div>";
     }
 }
 
@@ -60,45 +60,53 @@ $title = "Kategori - Sistem Inventaris";
 include 'includes/header.php';
 ?>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2><i class="fas fa-tags"></i> Kelola Kategori</h2>
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalKategori">
-        <i class="fas fa-plus"></i> Tambah Kategori
-    </button>
-</div>
+<!-- Pastikan semua konten kategori berada di dalam elemen <main> ini -->
+<main class="flex-grow container mx-auto px-4 py-8 max-w-7xl">
+    <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-700 flex items-center gap-2">
+            <i class="fas fa-tags text-yellow-500"></i> Kelola Kategori
+        </h2>
+        <button 
+            class="mt-4 sm:mt-0 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded shadow flex items-center gap-2"
+            onclick="document.getElementById('modalKategori').classList.remove('hidden')"
+        >
+            <i class="fas fa-plus"></i> Tambah Kategori
+        </button>
+    </div>
 
-<?= $message ?>
+    <?= $message ?>
 
-<!-- Tabel Kategori -->
-<div class="card">
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-striped">
-                <thead>
+    <!-- Tabel Kategori -->
+    <div class="bg-white rounded-lg shadow mb-8">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-100">
                     <tr>
-                        <th>No</th>
-                        <th>Nama Kategori</th>
-                        <th>Deskripsi</th>
-                        <th>Tanggal Dibuat</th>
-                        <th>Aksi</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">No</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Kategori</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Deskripsi</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal Dibuat</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="bg-white divide-y divide-gray-200">
                     <?php 
                     $no = 1;
                     while ($row = mysqli_fetch_assoc($categories)): 
                     ?>
                     <tr>
-                        <td><?= $no++ ?></td>
-                        <td><?= $row['nama_kategori'] ?></td>
-                        <td><?= $row['deskripsi'] ?></td>
-                        <td><?= date('d/m/Y H:i', strtotime($row['created_at'])) ?></td>
-                        <td>
-                            <a href="?edit=<?= $row['id'] ?>" class="btn btn-warning btn-sm">
+                        <td class="px-4 py-2"><?= $no++ ?></td>
+                        <td class="px-4 py-2"><?= htmlspecialchars($row['nama_kategori']) ?></td>
+                        <td class="px-4 py-2"><?= htmlspecialchars($row['deskripsi']) ?></td>
+                        <td class="px-4 py-2"><?= date('d/m/Y H:i', strtotime($row['created_at'])) ?></td>
+                        <td class="px-4 py-2 flex gap-2">
+                            <a href="?edit=<?= $row['id'] ?>" 
+                                class="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded text-sm flex items-center gap-1">
                                 <i class="fas fa-edit"></i> Edit
                             </a>
-                            <a href="?delete=<?= $row['id'] ?>" class="btn btn-danger btn-sm" 
-                               onclick="return confirm('Yakin ingin menghapus kategori ini?')">
+                            <a href="?delete=<?= $row['id'] ?>" 
+                                class="bg-gray-400 hover:bg-gray-500 text-white px-3 py-1 rounded text-sm flex items-center gap-1"
+                                onclick="return confirm('Yakin ingin menghapus kategori ini?')">
                                 <i class="fas fa-trash"></i> Hapus
                             </a>
                         </td>
@@ -108,52 +116,47 @@ include 'includes/header.php';
             </table>
         </div>
     </div>
-</div>
 
-<!-- Modal Tambah/Edit Kategori -->
-<div class="modal fade" id="modalKategori" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
+    <!-- Modal Tambah/Edit Kategori -->
+    <div id="modalKategori" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 <?= $edit_data ? '' : 'hidden' ?>">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-4">
+            <div class="flex justify-between items-center border-b px-6 py-4">
+                <h5 class="text-lg font-semibold text-gray-700">
                     <?= $edit_data ? 'Edit Kategori' : 'Tambah Kategori' ?>
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="text-gray-400 hover:text-gray-700 text-2xl font-bold"
+                    onclick="document.getElementById('modalKategori').classList.add('hidden')">&times;</button>
             </div>
-            <form method="POST">
-                <div class="modal-body">
-                    <?php if ($edit_data): ?>
-                    <input type="hidden" name="id" value="<?= $edit_data['id'] ?>">
-                    <?php endif; ?>
-                    
-                    <div class="mb-3">
-                        <label for="nama_kategori" class="form-label">Nama Kategori</label>
-                        <input type="text" name="nama_kategori" class="form-control" 
-                               value="<?= $edit_data['nama_kategori'] ?? '' ?>" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="deskripsi" class="form-label">Deskripsi</label>
-                        <textarea name="deskripsi" class="form-control" rows="3"><?= $edit_data['deskripsi'] ?? '' ?></textarea>
-                    </div>
+            <form method="POST" class="px-6 py-4">
+                <?php if ($edit_data): ?>
+                <input type="hidden" name="id" value="<?= $edit_data['id'] ?>">
+                <?php endif; ?>
+                
+                <div class="mb-4">
+                    <label for="nama_kategori" class="block text-gray-700 font-medium mb-1">Nama Kategori</label>
+                    <input type="text" name="nama_kategori" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400" 
+                            value="<?= htmlspecialchars($edit_data['nama_kategori'] ?? '') ?>" required>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" name="<?= $edit_data ? 'edit' : 'tambah' ?>" class="btn btn-primary">
+                <div class="mb-4">
+                    <label for="deskripsi" class="block text-gray-700 font-medium mb-1">Deskripsi</label>
+                    <textarea name="deskripsi" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400" rows="3"><?= htmlspecialchars($edit_data['deskripsi'] ?? '') ?></textarea>
+                </div>
+                <div class="flex justify-end gap-2">
+                    <button type="button" class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded" 
+                        onclick="document.getElementById('modalKategori').classList.add('hidden')">Batal</button>
+                    <button type="submit" name="<?= $edit_data ? 'edit' : 'tambah' ?>" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded font-semibold">
                         <?= $edit_data ? 'Update' : 'Simpan' ?>
                     </button>
                 </div>
             </form>
         </div>
     </div>
-</div>
 
-<?php if ($edit_data): ?>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    var modal = new bootstrap.Modal(document.getElementById('modalKategori'));
-    modal.show();
-});
-</script>
-<?php endif; ?>
-
-<?php include 'includes/footer.php'; ?>
+    <?php if ($edit_data): ?>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('modalKategori').classList.remove('hidden');
+    });
+    </script>
+    <?php endif; ?>
+</main>
